@@ -1,6 +1,6 @@
 # DocuMind AI 📄
 
-AI-powered document intelligence platform built with Next.js 14, Supabase, Pinecone, and OpenAI.
+AI-powered document intelligence platform built with Next.js 14, Supabase, and Pinecone embeddings.
 
 ## 🚀 Features
 

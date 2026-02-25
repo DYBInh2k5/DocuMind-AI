@@ -17,6 +17,14 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "DocuMind AI - Your Intelligent Document Assistant",
   description: "Upload documents, search with AI, and get instant answers",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+    },
+  },
 };
 
 export default function RootLayout({

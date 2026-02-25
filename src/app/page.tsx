@@ -94,7 +94,10 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="container mx-auto px-6 py-8 text-center text-gray-600 dark:text-gray-400">
-        <p>© 2026 DocuMind AI. Built with Next.js, Supabase, and OpenAI.</p>
+        <p>
+          © {new Date().getFullYear()} DocuMind AI. Built with Next.js, Supabase,
+          and Pinecone.
+        </p>
       </footer>
     </div>
   );
