@@ -6,6 +6,8 @@ import { pineconeIndex, generateEmbedding } from '@/lib/pinecone';
 import { generateSummary } from '@/lib/openai';
 import mammoth from 'mammoth';
 
+export const runtime = 'nodejs';
+
 // Import pdf-parse - use any type to bypass ESM module issues
 const getPdfParse = async (): Promise<any> => {
   const pdfParse = await import('pdf-parse');
@@ -33,6 +35,15 @@ export async function POST(req: Request) {
 
     if (!file) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 });
+    }
+
+    // Vercel Serverless body size limit is ~10MB; enforce a safe limit
+    const maxFileSizeBytes = 9 * 1024 * 1024; // 9MB
+    if (file.size > maxFileSizeBytes) {
+      return NextResponse.json(
+        { error: 'File too large. Please upload files under 9MB.' },
+        { status: 413 }
+      );
     }
 
     // Get user from database
@@ -108,27 +119,35 @@ export async function POST(req: Request) {
 
     if (error) throw error;
 
-    // Generate embeddings and store in Pinecone
-    const chunks = chunkText(content, 1000); // Split into chunks
-    const embeddings = await Promise.all(
-      chunks.map(async (chunk, index) => ({
-        id: `${document.id}-chunk-${index}`,
-        values: await generateEmbedding(chunk, 'passage'),
-        metadata: {
-          documentId: document.id,
-          userId: user.id,
-          content: chunk,
-          chunkIndex: index,
-        },
-      }))
-    );
+    let embeddingWarning: string | null = null;
 
-    // Upsert to Pinecone with correct format
-    if (pineconeIndex) {
-      await pineconeIndex.namespace('').upsert(embeddings as any);
+    // Generate embeddings and store in Pinecone (non-fatal if it fails)
+    try {
+      const chunks = chunkText(content, 1000); // Split into chunks
+      const embeddings = await Promise.all(
+        chunks.map(async (chunk, index) => ({
+          id: `${document.id}-chunk-${index}`,
+          values: await generateEmbedding(chunk, 'passage'),
+          metadata: {
+            documentId: document.id,
+            userId: user.id,
+            content: chunk,
+            chunkIndex: index,
+          },
+        }))
+      );
+
+      if (pineconeIndex) {
+        await pineconeIndex.namespace('').upsert(embeddings as any);
+      } else {
+        embeddingWarning = 'Pinecone not configured; embeddings skipped.';
+      }
+    } catch (embedError: any) {
+      console.error('Embedding error:', embedError);
+      embeddingWarning = 'Embedding failed; document uploaded without vector search.';
     }
 
-    return NextResponse.json({ document, remaining });
+    return NextResponse.json({ document, remaining, embeddingWarning });
   } catch (error: any) {
     console.error('Upload error:', error);
     return NextResponse.json(
