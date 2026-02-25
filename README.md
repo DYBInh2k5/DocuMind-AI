@@ -1,24 +1,174 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# DocuMind AI 📄
 
-## Getting Started
+AI-powered document intelligence platform built with Next.js 14, Supabase, Pinecone, and OpenAI.
 
-First, run the development server:
+## 🚀 Features
+
+- **AI Document Search**: Semantic search across all your documents
+- **Q&A Assistant**: Ask questions and get instant AI-powered answers
+- **Smart Summaries**: Auto-generate document summaries
+- **Team Collaboration**: Share documents with team members
+- **Subscription Plans**: Free, Pro, and Enterprise tiers
+
+## 🛠️ Tech Stack
+
+- **Frontend**: Next.js 14, TypeScript, Tailwind CSS
+- **Authentication**: Clerk
+- **Database**: Supabase (PostgreSQL)
+- **Vector DB**: Pinecone (for AI embeddings)
+- **AI**: OpenAI GPT-4
+- **Payments**: Stripe
+- **Email**: Resend
+- **Caching**: Upstash Redis
+- **Analytics**: PostHog
+- **Error Tracking**: Sentry
+- **Deployment**: Vercel
+- **DNS**: Cloudflare
+
+## ⚡ Quick Start
+
+**New to this project?** Start here: [QUICKSTART.md](./QUICKSTART.md) - Get running in 5 minutes!
+
+### Installation
 
 ```bash
+# Clone repository
+git clone <your-repo-url>
+cd documind-ai
+
+# Install dependencies
+npm install
+
+# Setup environment variables
+cp .env.example .env.local
+# Fill in your API keys
+
+# Run development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 📖 Documentation
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **[QUICKSTART.md](./QUICKSTART.md)** - Get started in 5 minutes
+- **[SETUP.md](./SETUP.md)** - Complete setup guide for all services
+- **[DEPLOYMENT.md](./DEPLOYMENT.md)** - Deploy to Vercel + Cloudflare
+- **[DEVELOPMENT.md](./DEVELOPMENT.md)** - Development workflow & debugging
+- **[API.md](./API.md)** - Complete API documentation
+- **[PROJECT_SUMMARY.md](./PROJECT_SUMMARY.md)** - Project overview & roadmap
+
+## 🎯 Features
+
+### Core Features
+- ✅ **Document Upload** - PDF, DOCX, TXT support
+- ✅ **AI Semantic Search** - Vector-based search with Pinecone
+- ✅ **Q&A Assistant** - GPT-4 powered answers
+- ✅ **Auto Summaries** - AI-generated document summaries
+- ✅ **User Authentication** - Clerk integration
+- ✅ **Subscription Plans** - Free, Pro ($19/mo), Enterprise ($99/mo)
+- ✅ **Payment Processing** - Stripe integration
+- ✅ **Email Notifications** - Resend for transactional emails
+- ✅ **Rate Limiting** - Redis-based protection
+- ✅ **Analytics** - PostHog user tracking
+- ✅ **Error Monitoring** - Sentry integration
+
+### Coming Soon
+- 🔜 Document folders & organization
+- 🔜 Team workspaces
+- 🔜 Advanced sharing & permissions
+- 🔜 API access for Enterprise
+- 🔜 Mobile app
+
+## 🏗️ Project Structure
+
+```
+documind-ai/
+├── src/
+│   ├── app/              # Next.js App Router
+│   │   ├── api/          # API routes
+│   │   ├── dashboard/    # Dashboard page
+│   │   ├── pricing/      # Pricing page
+│   │   └── page.tsx      # Landing page
+│   ├── lib/              # Shared utilities
+│   │   ├── supabase.ts   # Database client
+│   │   ├── stripe.ts     # Payment client
+│   │   ├── pinecone.ts   # Vector DB
+│   │   ├── openai.ts     # AI functions
+│   │   └── ...
+│   └── types/            # TypeScript types
+├── supabase_schema.sql   # Database schema
+└── .env.local            # Environment variables
+```
+
+## 🔧 Tech Stack Details
+
+| Category | Technology | Purpose |
+|----------|-----------|---------|
+| Frontend | Next.js 14 + TypeScript | React framework |
+| Styling | Tailwind CSS | Utility-first CSS |
+| Auth | Clerk | User management |
+| Database | Supabase | PostgreSQL + RLS |
+| Vector DB | Pinecone | AI embeddings |
+| AI | OpenAI GPT-4 | Text generation |
+| Payments | Stripe | Subscriptions |
+| Email | Resend | Transactional emails |
+| Cache | Upstash Redis | Rate limiting |
+| Analytics | PostHog | User tracking |
+| Monitoring | Sentry | Error tracking |
+| Hosting | Vercel | Serverless deployment |
+| DNS/CDN | Cloudflare | Security & performance |
+
+## 💰 Pricing Plans
+
+| Plan | Price | Documents | Queries | Target Users |
+|------|-------|-----------|---------|--------------|
+| Free | $0/mo | 10 | 100/mo | Individuals testing |
+| Pro | $19/mo | 1,000 | Unlimited | Power users |
+| Enterprise | $99/mo | Unlimited | Unlimited | Teams & businesses |
+
+## 🚀 Deployment
+
+### Deploy to Vercel (5 minutes)
+
+```bash
+# Install Vercel CLI
+npm i -g vercel
+
+# Deploy
+vercel --prod
+```
+
+Or use [Vercel Dashboard](https://vercel.com) to import from GitHub.
+
+**See [DEPLOYMENT.md](./DEPLOYMENT.md) for complete guide.**
+
+## 🧪 Testing
+
+### Test Locally
+
+```bash
+# Start dev server
+npm run dev
+
+# Test features:
+# 1. Sign up at /sign-up
+# 2. Upload document at /dashboard
+# 3. Ask questions in search
+# 4. Test payment at /pricing (use 4242 4242 4242 4242)
+```
+
+### Stripe Test Cards
+
+- **Success**: 4242 4242 4242 4242
+- **Declined**: 4000 0000 0000 0002
+
+## 📊 Monitoring
+
+- **Errors**: [sentry.io](https://sentry.io)
+- **Analytics**: [posthog.com](https://posthog.com)
+- **Payments**: [stripe.com/dashboard](https://stripe.com/dashboard)
+- **Database**: [supabase.com/dashboard](https://supabase.com/dashboard)
 
 ## Learn More
 

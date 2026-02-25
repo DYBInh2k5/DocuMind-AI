@@ -6,16 +6,32 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "setup": "node scripts/setup.js",
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf .next node_modules"
   },
   "dependencies": {
+    "@clerk/nextjs": "^6.38.2",
+    "@pinecone-database/pinecone": "^7.1.0",
+    "@sentry/nextjs": "^10.40.0",
+    "@stripe/stripe-js": "^8.8.0",
+    "@supabase/supabase-js": "^2.97.0",
+    "@upstash/redis": "^1.36.2",
+    "mammoth": "^1.11.0",
     "next": "16.1.6",
+    "openai": "^6.25.0",
+    "pdf-parse": "^2.4.5",
+    "posthog-js": "^1.353.1",
     "react": "19.2.3",
-    "react-dom": "19.2.3"
+    "react-dom": "19.2.3",
+    "resend": "^6.9.2",
+    "stripe": "^20.3.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
+    "@types/pdf-parse": "^1.1.5",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "babel-plugin-react-compiler": "1.0.0",
