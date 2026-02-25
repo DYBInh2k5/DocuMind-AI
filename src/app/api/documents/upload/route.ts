@@ -113,7 +113,7 @@ export async function POST(req: Request) {
     const embeddings = await Promise.all(
       chunks.map(async (chunk, index) => ({
         id: `${document.id}-chunk-${index}`,
-        values: await generateEmbedding(chunk),
+        values: await generateEmbedding(chunk, 'passage'),
         metadata: {
           documentId: document.id,
           userId: user.id,
