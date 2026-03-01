@@ -57,14 +57,6 @@ export async function POST(req: Request) {
       });
     }
 
-    // Extract context from matched documents
-    const context = results
-      .map((match) => match.metadata?.content as string)
-      .filter(Boolean);
-
-    // Generate answer using OpenAI
-    const answer = await answerQuestion(query, context);
-
     // Get document details for sources
     const documentIds = [
       ...new Set(results.map((r) => r.metadata?.documentId as string)),
@@ -74,18 +66,32 @@ export async function POST(req: Request) {
       .select('id, title, file_name')
       .in('id', documentIds);
 
+    const existingDocumentIds = new Set((documents || []).map((doc) => doc.id));
+    const filteredResults = results.filter((result) =>
+      existingDocumentIds.has(result.metadata?.documentId as string)
+    );
+
+    const filteredContext = filteredResults
+      .map((match) => match.metadata?.content as string)
+      .filter(Boolean);
+
+    const finalAnswer =
+      filteredContext.length > 0
+        ? await answerQuestion(query, filteredContext)
+        : "I couldn't find any relevant documents to answer your question.";
+
     // Save query to database
     await supabaseAdmin.from('queries').insert({
       user_id: user.id,
       query,
-      response: answer,
-      document_ids: documentIds,
+      response: finalAnswer,
+      document_ids: Array.from(existingDocumentIds),
     });
 
     return NextResponse.json({
-      answer,
+      answer: finalAnswer,
       sources: documents || [],
-      matches: results.length,
+      matches: filteredResults.length,
     });
   } catch (error: any) {
     console.error('Search error:', error);

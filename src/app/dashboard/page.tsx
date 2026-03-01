@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { supabaseAdmin } from '@/lib/supabase';
 import { UploadDocumentButton } from '@/components/upload-document-button';
 import { AskAssistant } from '@/components/ask-assistant';
+import { DeleteDocumentButton } from '@/components/delete-document-button';
 
 export default async function DashboardPage() {
   const { userId } = await auth();
@@ -22,9 +23,13 @@ export default async function DashboardPage() {
     redirect('/');
   }
 
-  const [{ count: documentCount }, { data: recentDocuments }] = await Promise.all([
+  const [{ count: documentCount }, { count: queryCount }, { data: recentDocuments }] = await Promise.all([
     supabaseAdmin
       .from('documents')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', user.id),
+    supabaseAdmin
+      .from('queries')
       .select('*', { count: 'exact', head: true })
       .eq('user_id', user.id),
     supabaseAdmin
@@ -92,7 +97,7 @@ export default async function DashboardPage() {
             </div>
           </div>
           <div className="rounded-lg bg-white p-6 shadow dark:bg-gray-800">
-            <div className="text-3xl font-bold text-green-600">0</div>
+            <div className="text-3xl font-bold text-green-600">{queryCount || 0}</div>
             <div className="mt-2 text-gray-600 dark:text-gray-400">
               Queries Used
             </div>
@@ -109,9 +114,15 @@ export default async function DashboardPage() {
 
         {/* Documents List */}
         <div className="rounded-lg bg-white p-6 shadow dark:bg-gray-800">
-          <h2 className="mb-4 text-xl font-bold text-gray-900 dark:text-white">
-            Recent Documents
-          </h2>
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">Recent Documents</h2>
+            <Link
+              href="/dashboard/documents"
+              className="text-sm font-medium text-blue-600 hover:text-blue-700"
+            >
+              View all
+            </Link>
+          </div>
           {recentDocuments && recentDocuments.length > 0 ? (
             <div className="space-y-3">
               {recentDocuments.map((document) => (
@@ -123,9 +134,18 @@ export default async function DashboardPage() {
                     <p className="font-medium text-gray-900 dark:text-white">{document.title}</p>
                     <p className="text-sm text-gray-500 dark:text-gray-400">{document.file_name}</p>
                   </div>
-                  <div className="text-right text-sm text-gray-500 dark:text-gray-400">
-                    <p>{Math.max(1, Math.round(document.file_size / 1024))} KB</p>
-                    <p>{new Date(document.created_at).toLocaleDateString()}</p>
+                  <div className="flex items-center gap-3">
+                    <div className="text-right text-sm text-gray-500 dark:text-gray-400">
+                      <p>{Math.max(1, Math.round(document.file_size / 1024))} KB</p>
+                      <p>{new Date(document.created_at).toLocaleDateString()}</p>
+                    </div>
+                    <Link
+                      href={`/dashboard/documents/${document.id}`}
+                      className="rounded border border-blue-200 px-3 py-1.5 text-xs font-medium text-blue-600 hover:bg-blue-50 dark:border-blue-900 dark:text-blue-400 dark:hover:bg-blue-950"
+                    >
+                      View
+                    </Link>
+                    <DeleteDocumentButton documentId={document.id} />
                   </div>
                 </div>
               ))}
