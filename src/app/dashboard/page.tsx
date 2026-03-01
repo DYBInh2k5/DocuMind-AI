@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { supabaseAdmin } from '@/lib/supabase';
 import { UploadDocumentButton } from '@/components/upload-document-button';
+import { AskAssistant } from '@/components/ask-assistant';
 
 export default async function DashboardPage() {
   const { userId } = await auth();
@@ -104,22 +105,7 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        {/* Search Section */}
-        <div className="mb-8 rounded-lg bg-white p-6 shadow dark:bg-gray-800">
-          <h2 className="mb-4 text-xl font-bold text-gray-900 dark:text-white">
-            Ask AI Assistant
-          </h2>
-          <div className="flex gap-4">
-            <input
-              type="text"
-              placeholder="Ask a question about your documents..."
-              className="flex-1 rounded-lg border px-4 py-3 focus:border-blue-500 focus:outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-white"
-            />
-            <button className="rounded-lg bg-blue-600 px-6 py-3 font-semibold text-white hover:bg-blue-700">
-              Search
-            </button>
-          </div>
-        </div>
+        <AskAssistant />
 
         {/* Documents List */}
         <div className="rounded-lg bg-white p-6 shadow dark:bg-gray-800">

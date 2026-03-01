@@ -12,7 +12,16 @@ export async function answerQuestion(
   context: string[]
 ): Promise<string> {
   if (!openai) {
-    throw new Error('OpenAI not configured');
+    const safeContext = context.filter(Boolean).slice(0, 3);
+    if (safeContext.length === 0) {
+      return "I couldn't find enough information in your documents to answer that.";
+    }
+
+    const preview = safeContext
+      .map((chunk, index) => `${index + 1}. ${chunk.slice(0, 280).trim()}...`)
+      .join('\n\n');
+
+    return `OpenAI is not configured, so here are the most relevant document snippets for your question: "${question}"\n\n${preview}`;
   }
   
   const systemPrompt = `You are a helpful AI assistant that answers questions based on the provided document context. 
