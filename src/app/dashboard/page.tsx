@@ -1,6 +1,8 @@
 import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
+import { supabaseAdmin } from '@/lib/supabase';
+import { UploadDocumentButton } from '@/components/upload-document-button';
 
 export default async function DashboardPage() {
   const { userId } = await auth();
@@ -8,6 +10,29 @@ export default async function DashboardPage() {
   if (!userId) {
     redirect('/sign-in');
   }
+
+  const { data: user } = await supabaseAdmin
+    .from('users')
+    .select('*')
+    .eq('clerk_id', userId)
+    .single();
+
+  if (!user) {
+    redirect('/');
+  }
+
+  const [{ count: documentCount }, { data: recentDocuments }] = await Promise.all([
+    supabaseAdmin
+      .from('documents')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', user.id),
+    supabaseAdmin
+      .from('documents')
+      .select('id, title, file_name, file_size, created_at')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(5),
+  ]);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -54,15 +79,13 @@ export default async function DashboardPage() {
               Upload and manage your documents
             </p>
           </div>
-          <button className="rounded-lg bg-blue-600 px-6 py-3 font-semibold text-white hover:bg-blue-700">
-            + Upload Document
-          </button>
+          <UploadDocumentButton />
         </div>
 
         {/* Stats Cards */}
         <div className="mb-8 grid gap-6 md:grid-cols-3">
           <div className="rounded-lg bg-white p-6 shadow dark:bg-gray-800">
-            <div className="text-3xl font-bold text-blue-600">0</div>
+            <div className="text-3xl font-bold text-blue-600">{documentCount || 0}</div>
             <div className="mt-2 text-gray-600 dark:text-gray-400">
               Documents
             </div>
@@ -74,7 +97,7 @@ export default async function DashboardPage() {
             </div>
           </div>
           <div className="rounded-lg bg-white p-6 shadow dark:bg-gray-800">
-            <div className="text-3xl font-bold text-purple-600">Free</div>
+            <div className="text-3xl font-bold text-purple-600">{user.plan}</div>
             <div className="mt-2 text-gray-600 dark:text-gray-400">
               Current Plan
             </div>
@@ -103,12 +126,32 @@ export default async function DashboardPage() {
           <h2 className="mb-4 text-xl font-bold text-gray-900 dark:text-white">
             Recent Documents
           </h2>
-          <div className="flex flex-col items-center justify-center py-12 text-center">
-            <div className="text-6xl opacity-50">📄</div>
-            <p className="mt-4 text-gray-600 dark:text-gray-400">
-              No documents yet. Upload your first document to get started!
-            </p>
-          </div>
+          {recentDocuments && recentDocuments.length > 0 ? (
+            <div className="space-y-3">
+              {recentDocuments.map((document) => (
+                <div
+                  key={document.id}
+                  className="flex items-center justify-between rounded-lg border border-gray-200 px-4 py-3 dark:border-gray-700"
+                >
+                  <div>
+                    <p className="font-medium text-gray-900 dark:text-white">{document.title}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{document.file_name}</p>
+                  </div>
+                  <div className="text-right text-sm text-gray-500 dark:text-gray-400">
+                    <p>{Math.max(1, Math.round(document.file_size / 1024))} KB</p>
+                    <p>{new Date(document.created_at).toLocaleDateString()}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+              <div className="text-6xl opacity-50">📄</div>
+              <p className="mt-4 text-gray-600 dark:text-gray-400">
+                No documents yet. Upload your first document to get started!
+              </p>
+            </div>
+          )}
         </div>
       </main>
     </div>
