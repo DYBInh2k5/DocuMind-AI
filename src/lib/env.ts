@@ -5,8 +5,10 @@
 
 export function getEnvVar(key: string, defaultValue: string = ''): string {
   if (typeof window !== 'undefined') {
+    type ClientEnvWindow = Window & { ENV?: Record<string, string> };
+    const clientWindow = window as ClientEnvWindow;
     // Client side
-    return (window as any).ENV?.[key] || defaultValue;
+    return clientWindow.ENV?.[key] || defaultValue;
   }
   // Server side
   return process.env[key] || defaultValue;

@@ -5,30 +5,29 @@
  * Creates .env.local with placeholder values if it doesn't exist
  */
 
-const fs = require('fs');
-const path = require('path');
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const envPath = path.join(__dirname, '..', '.env.local');
 const envExamplePath = path.join(__dirname, '..', '.env.example');
 
 console.log('🚀 DocuMind AI Setup\n');
 
-// Check if .env.local already exists
 if (fs.existsSync(envPath)) {
   console.log('✅ .env.local already exists');
   console.log('   To reset, delete .env.local and run this script again\n');
   process.exit(0);
 }
 
-// Read .env.example
 if (!fs.existsSync(envExamplePath)) {
   console.error('❌ .env.example not found');
   process.exit(1);
 }
 
-const envExample = fs.readFileSync(envExamplePath, 'utf8');
-
-// Generate placeholder .env.local
 const placeholderEnv = `# Auto-generated .env.local
 # Replace these placeholder values with real API keys
 # See QUICKSTART.md for setup instructions
@@ -61,10 +60,10 @@ UPSTASH_REDIS_REST_TOKEN=placeholder
 
 # Pinecone (Required for AI features)
 PINECONE_API_KEY=placeholder
-PINECONE_ENVIRONMENT=us-east1-gcp
 PINECONE_INDEX_NAME=documind-vectors
+PINECONE_EMBEDDING_MODEL=llama-text-embed-v2
 
-# OpenAI (Required for AI features)
+# OpenAI (Optional if using Pinecone embeddings)
 OPENAI_API_KEY=sk-placeholder
 
 # Resend (Optional for development)

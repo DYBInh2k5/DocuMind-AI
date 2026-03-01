@@ -23,11 +23,11 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
 // Helper functions for tracking events
 export function trackEvent(
   event: string,
-  properties?: Record<string, any>
+  properties?: Record<string, unknown>
 ) {
   posthog.capture(event, properties);
 }
 
-export function identifyUser(userId: string, properties?: Record<string, any>) {
+export function identifyUser(userId: string, properties?: Record<string, unknown>) {
   posthog.identify(userId, properties);
 }

@@ -85,10 +85,11 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json({ received: true });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Webhook handler failed';
     console.error('Clerk webhook error:', error);
     return NextResponse.json(
-      { error: error.message || 'Webhook handler failed' },
+      { error: errorMessage },
       { status: 500 }
     );
   }

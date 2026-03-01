@@ -93,10 +93,11 @@ export async function POST(req: Request) {
       sources: documents || [],
       matches: filteredResults.length,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Failed to process query';
     console.error('Search error:', error);
     return NextResponse.json(
-      { error: error.message || 'Failed to process query' },
+      { error: errorMessage },
       { status: 500 }
     );
   }

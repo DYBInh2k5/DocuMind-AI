@@ -8,10 +8,15 @@ import mammoth from 'mammoth';
 
 export const runtime = 'nodejs';
 
-// Import pdf-parse - use any type to bypass ESM module issues
-const getPdfParse = async (): Promise<any> => {
-  const pdfParse = await import('pdf-parse');
-  return (pdfParse as any).default || pdfParse;
+type PdfParseResult = { text: string };
+type PdfParseFunction = (input: Buffer) => Promise<PdfParseResult>;
+
+const getPdfParse = async (): Promise<PdfParseFunction> => {
+  const pdfParseModule = await import('pdf-parse');
+  const parser = ('default' in pdfParseModule
+    ? pdfParseModule.default
+    : pdfParseModule) as unknown as PdfParseFunction;
+  return parser;
 };
 
 export async function POST(req: Request) {
@@ -138,20 +143,23 @@ export async function POST(req: Request) {
       );
 
       if (pineconeIndex) {
-        await pineconeIndex.namespace('').upsert(embeddings as any);
+        await pineconeIndex.namespace('').upsert(embeddings as unknown as Parameters<
+          ReturnType<typeof pineconeIndex.namespace>['upsert']
+        >[0]);
       } else {
         embeddingWarning = 'Pinecone not configured; embeddings skipped.';
       }
-    } catch (embedError: any) {
+    } catch (embedError: unknown) {
       console.error('Embedding error:', embedError);
       embeddingWarning = 'Embedding failed; document uploaded without vector search.';
     }
 
     return NextResponse.json({ document, remaining, embeddingWarning });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Failed to upload document';
     console.error('Upload error:', error);
     return NextResponse.json(
-      { error: error.message || 'Failed to upload document' },
+      { error: errorMessage },
       { status: 500 }
     );
   }

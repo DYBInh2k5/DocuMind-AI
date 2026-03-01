@@ -51,8 +51,9 @@ export function UploadDocumentButton() {
       setTimeout(() => {
         window.location.reload();
       }, 700);
-    } catch (error: any) {
-      setMessage(error.message || 'Upload thất bại');
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Upload thất bại';
+      setMessage(errorMessage);
       setMessageType('error');
     } finally {
       setIsUploading(false);
